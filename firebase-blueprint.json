@@ -1,0 +1,107 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User's core profile and training preferences",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "age": { "type": "number" },
+        "trainingExperience": { "type": "string", "enum": ["Beginner", "Intermediate", "Advanced"] },
+        "primaryGoal": { "type": "string", "enum": ["Sprout", "Rise", "Peak", "Stillness"] },
+        "onboarded": { "type": "boolean" },
+        "trainingPlan": { "$ref": "TrainingPlan" },
+        "daysPerWeek": { "type": "number" },
+        "workoutDuration": { "type": "number" },
+        "focusAreas": { "type": "array", "items": { "type": "string" } },
+        "contraception": { "type": "boolean" },
+        "cycleRegularity": { "type": "string", "enum": ["Regular", "Irregular", "Not Tracking"] }
+      },
+      "required": ["name", "age", "trainingExperience", "primaryGoal", "onboarded", "daysPerWeek", "workoutDuration", "focusAreas", "contraception", "cycleRegularity"]
+    },
+    "TrainingPlan": {
+      "title": "TrainingPlan",
+      "description": "User's weekly training structure",
+      "type": "object",
+      "properties": {
+        "split": { "type": "string" },
+        "daysPerWeek": { "type": "number" },
+        "schedule": { "type": "object" },
+        "focus": { "type": "string" }
+      }
+    },
+    "CycleState": {
+      "title": "CycleState",
+      "description": "Current hormonal cycle progress",
+      "type": "object",
+      "properties": {
+        "currentDay": { "type": "number" },
+        "phase": { "type": "string" },
+        "averageCycleLength": { "type": "number" },
+        "periodDuration": { "type": "number" },
+        "lastPeriodDate": { "type": "string" }
+      },
+      "required": ["currentDay", "phase", "averageCycleLength", "periodDuration", "lastPeriodDate"]
+    },
+    "DailySeed": {
+      "title": "DailySeed",
+      "description": "Daily readiness and symptom tracking",
+      "type": "object",
+      "properties": {
+        "energyScore": { "type": "number" },
+        "moodScore": { "type": "number" },
+        "symptoms": { "type": "array" },
+        "timestamp": { "type": "string" }
+      }
+    },
+    "Workout": {
+      "title": "Workout",
+      "description": "A workout session recording",
+      "type": "object",
+      "properties": {
+        "exercises": { "type": "array" },
+        "swapHistory": { "type": "array" },
+        "isCompleted": { "type": "boolean" },
+        "briefing": { "type": "string" },
+        "nutritionTip": { "type": "string" },
+        "scienceCitation": { "type": "string" },
+        "isRestDay": { "type": "boolean" },
+        "date": { "type": "string" },
+        "phase": { "type": "string" },
+        "day": { "type": "number" }
+      }
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Message in the AI chat history",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["user", "model"] },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Main user document"
+    },
+    "/users/{userId}/cycle/current": {
+      "schema": "CycleState",
+      "description": "Current cycle state"
+    },
+    "/users/{userId}/seeds/{seedId}": {
+      "schema": "DailySeed",
+      "description": "Daily tracking seeds"
+    },
+    "/users/{userId}/workouts/{workoutId}": {
+      "schema": "Workout",
+      "description": "Completed and current workouts"
+    },
+    "/users/{userId}/chat/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "Chat message history"
+    }
+  }
+}

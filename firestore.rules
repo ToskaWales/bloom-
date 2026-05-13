@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // -------------------------------------------------------------------------
+    // GLOBAL HELPERS
+    // -------------------------------------------------------------------------
+    
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // -------------------------------------------------------------------------
+    // VALIDATION HELPERS
+    // -------------------------------------------------------------------------
+
+    function isValidUserProfile(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.age is number &&
+             data.trainingExperience is string &&
+             data.primaryGoal is string &&
+             data.onboarded is bool &&
+             data.daysPerWeek is number &&
+             data.workoutDuration is number &&
+             data.focusAreas is list &&
+             data.contraception is bool &&
+             data.cycleRegularity is string;
+    }
+
+    function isValidCycleState(data) {
+      return data.currentDay is number &&
+             data.phase is string &&
+             data.averageCycleLength is number &&
+             data.periodDuration is number &&
+             data.lastPeriodDate is string;
+    }
+
+    function isValidSeed(data) {
+      return data.energyScore is number &&
+             data.moodScore is number &&
+             data.symptoms is list &&
+             data.timestamp is string;
+    }
+
+    function isValidWorkout(data) {
+      return data.exercises is list &&
+             data.isCompleted is bool &&
+             data.date is string &&
+             data.phase is string &&
+             data.day is number;
+    }
+
+    function isValidChatMessage(data) {
+      return data.role is string &&
+             data.content is string &&
+             data.timestamp is string;
+    }
+
+    // -------------------------------------------------------------------------
+    // RULES
+    // -------------------------------------------------------------------------
+
+    // User document
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User subcollections
+    match /users/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Test connection
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}
